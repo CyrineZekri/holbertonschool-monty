@@ -1,33 +1,48 @@
 #include "monty.h"
+
 /**
- *
+ * main - main function
+ * @argc:  number of arguments
+ * @argv:  array of the elements
+ * Return: 0
  */
+
 int main(int argc, char *argv[])
 {
-	FILE *fd;
-	char *line;
-	int linenumber = 1;
+	size_t i = 0;
+	ssize_t read = 1;
+	stack_t *stack = NULL;
+	char *filename;
+	FILE *fp;
+	char *line = NULL;
+	unsigned int line_number = 0;
 
-	if (argc != 2) 
+	if (argc != 2)
 	{
-		fprintf(stderr, "USAGE : monty file\n");
+		fprintf(stderr, "USAGE: monty file\n");
+		exit(EXIT_FAILURE);
 	}
-	fd = fopen(argv[1], "r");
+	filename = argv[1];
+	fp = fopen(filename, "r");
+	if (fp == NULL)
 	{
-		if (fd == NULL)
+		fprintf(stderr, "Error: Can't open file %s\n", filename);
+		exit(EXIT_FAILURE);
+	}
+
+	while (read > 0)
+	{
+		read = getline(&line, &i, fp);
+		line_number++;
+
+		if (read > 0)
 		{
-			fprintf(stderr, "Error: Can't open file\n");
-			exit(EXIT_FAILURE);
+			execute(line, &stack, line_number);
 		}
 	}
-	while (fgets(line, sizeof(line), fd) != NULL)
-	{
-		if (line[strlen(line) - 1] == '\n')
-		{
-			line[strlen(line) - 1] = '\0';
-		}
-		linenumber++;
-		
-	}
-	return (linenumber);
+	free(line);
+	free_stack(stack);
+	fclose(fp);
+
+	return (0);
 }

@@ -1,89 +1,87 @@
 #include "monty.h"
+char *value;
+
 /**
- *
- *
+ * push - function that push to the stack
+ * @stack:       stack
+ * @line_number: Line Number
  */
-stack_t *addToEmpty(stack_t *head, int value)
+void push(stack_t **stack, __attribute__((unused)) unsigned int line_number)
 {
-    stack_t *newnode = (stack_t *)malloc(sizeof(stack_t));
-    newnode->next = NULL;
-    newnode->prev = NULL;
-    newnode->n = value;
-    head = newnode;
-    return (head);
+    stack_t *node = malloc(sizeof(stack_t));
+    int x;
+
+    x = atoi(value);
+    node->n = x;
+    node->prev = NULL;
+    node->next = *stack;
+
+    if (*stack != NULL)
+        (*stack)->prev = node;
+    *stack = node;
 }
-/**
- *
- *
- */
-stack_t *push(stack_t *head, int value)
-{
-    stack_t *newnode = (stack_t *)malloc(sizeof(stack_t));
-    if (newnode == NULL)
-    {
-        return NULL;
-    }
-    newnode->n = value;
-    newnode->prev = NULL;
-    newnode->next = head;
-    if (head != NULL)
-    {
-        head->prev = newnode;
-    }
-
-    return (head);
-};
-/**
- *
- *
- */
-void pall(stack_t *head)
-{
-    stack_t *tail = (stack_t *)malloc(sizeof(stack_t));
-
-    tail = head;
-    while (tail->next != NULL)
-    {
-        tail = tail->next;
-    }
-    while (tail != NULL)
-    {
-        printf("%d", tail->n);
-        tail = tail->prev;
-    }
-
-};
 
 /**
- *
- *
- *
+ * pall - function that prints all the values on the stack
+ *					starting from the top of the stack.
+ * @stack:       stack
+ * @line_number: Line Number
  */
-int pint(stack_t *head, int linenumber)
+void pall(stack_t **stack, __attribute__((unused)) unsigned int line_number)
 {
-    if (head == NULL)
+    stack_t *node = *stack;
+
+    while (node != NULL)
     {
-        fprintf(stderr, "L<line_number>: can't pint, stack empty\n");
+        printf("%d\n", node->n);
+        node = node->next;
+    }
+}
+
+/**
+ * pint - function pint
+ * @stack: stack
+ * @line_number: line_number
+ */
+void pint(stack_t **stack, unsigned int line_number)
+{
+    stack_t *node = *stack;
+
+    if (node == NULL)
+    {
+        fprintf(stderr, "L%d: can't pint, stack empty\n", line_number);
+        free_stack(*stack);
         exit(EXIT_FAILURE);
     }
-    else
-        return (head->n);
-};
-/**
- *
- *
- */
-void pop(stack_t *head)
-{
-    stack_t *tail = (stack_t *)malloc(sizeof(stack_t));
-    stack_t *newtail= (stack_t *)malloc(sizeof(stack_t));
-
-    tail = head;
-    while (tail->next != NULL)
+    while (node != NULL)
     {
-        tail = tail->next;
+        printf("%d\n", node->n);
+        node = node->prev;
     }
-    newtail = tail->prev;
-    newtail->next = NULL;
-    free(tail);
+}
+
+/**
+ * push_not_found - function that print error msg if push not found
+ * @opcode: the opcode
+ * @line_number: line number
+ */
+void push_not_found(char *opcode, unsigned int line_number)
+{
+    fprintf(stderr, "L%d: can't %s, stack too short\n", line_number, opcode);
+}
+
+/**
+ * free_stack - function that free the stack
+ * @stack: stack
+ */
+void free_stack(stack_t *stack)
+{
+    stack_t *a;
+
+    while (stack)
+    {
+        a = stack;
+        stack = stack->next;
+        free(a);
+    }
 }
